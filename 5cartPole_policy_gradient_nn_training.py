@@ -123,6 +123,21 @@ with tf.Session() as sess:
 
         print('Saving graph and session')
 
+        # export graph to meta file to run this on another file (run the other file to view the rendering)
         meta_graph_def = tf.train.export_meta_graph(filename='my-policy-model.meta')
         saver.save(sess, 'my-policy-model')
         
+## TODO: Install miniconda in college gpu inside docker container tensor1 and try this again
+## get the trained model to laptop
+
+env = gym.make('CartPole-v0')
+observations = env.reset()
+
+with tf.Session() as sess:
+    saver = tf.train.import_meta_graph('my-policy-model.meta')
+    saver.restore(sess, 'my-policy-model')
+
+    for x in range(500):
+        env.render()
+        action_val, gradients_val = sess.run([action, gradients], feed_dict={X:observations.reshape(1, num_inputs)})
+        observations, reward, done, info = env.step(action_val[0][0])
